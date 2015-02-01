@@ -3,16 +3,20 @@ package Inline::Perl6;
 use strict;
 use warnings;
 
-use Inline C => Config =>
-    LIBS => "-L$ENV{HOME}/install/rakudo/install/lib -lmoar",
-    INC => join(' ',
+use Inline C => config =>
+    libs => "-L$ENV{HOME}/install/rakudo/install/lib -lmoar",
+    inc => join(' ',
         map { "-I$ENV{HOME}/install/rakudo/install/include/$_" }
         qw(moar dynasm dyncall libatomic_ops libtommath libuv linenoise sha1 tinymt)
     ),
+    optimize => '-g',
 ;
 
-use Inline C => <<END_OF_C;
+use Inline C => <<'END_OF_C';
 #include <moar.h>
+
+extern SV *(*call_method_callback)(IV, char *);
+/*SV *(*call_method_callback)(IV, char *);*/
 
 MVMInstance *instance;
 const char *filename = "/home/nine/install/rakudo/inline.moarvm";
@@ -25,6 +29,20 @@ static void toplevel_initial_invoke(MVMThreadContext *tc, void *data) {
 }
 
 MVMCompUnit *cu;
+
+void p6_run_code(char *code) {
+    const char *raw_clargs[1];
+    instance->num_clargs = 1;
+    raw_clargs[0] = code;
+    instance->raw_clargs = raw_clargs;
+    instance->clargs = NULL; /* clear cache */
+
+    MVMThreadContext *tc = instance->main_thread;
+    MVMStaticFrame *start_frame;
+
+    start_frame = cu->body.main_frame ? cu->body.main_frame : cu->body.frames[0];
+    MVM_interp_run(tc, &toplevel_initial_invoke, start_frame);
+}
 
 void p6_initialize() {
     const char  *executable_name = NULL;
@@ -56,6 +74,8 @@ void p6_initialize() {
     MVMThreadContext *tc = instance->main_thread;
     cu = MVM_cu_map_from_file(tc, filename);
 
+    call_method_callback = NULL;
+
     MVMROOT(tc, cu, {
         /* The call to MVM_string_utf8_decode() may allocate, invalidating the
            location cu->body.filename */
@@ -67,32 +87,40 @@ void p6_initialize() {
             MVM_interp_run(tc, &toplevel_initial_invoke, cu->body.deserialize_frame);
         }
     });
-}
+    p6_run_code("use v6; use lib <lib>; use Inline::Perl6Helper;");
 
-void p6_run_code(char *code) {
-    //const char *raw_clargs[1];
-    const char **raw_clargs = malloc(sizeof(char*) * 1);
-    const char *code_arg = malloc(strlen(code) + 1);
-    strcpy(code_arg, code);
-    instance->num_clargs = 1;
-    raw_clargs[0] = code_arg;
-    instance->raw_clargs = raw_clargs;
-    instance->clargs = NULL;
+    /* Points to the current opcode. */
+    MVMuint8 *cur_op = NULL;
 
-    MVMThreadContext *tc = instance->main_thread;
-    MVMStaticFrame *start_frame;
+    /* The current frame's bytecode start. */
+    MVMuint8 *bytecode_start = NULL;
 
-    start_frame = cu->body.main_frame ? cu->body.main_frame : cu->body.frames[0];
-    MVM_interp_run(tc, &toplevel_initial_invoke, start_frame);
+    /* Points to the base of the current register set for the frame we
+     * are presently in. */
+    MVMRegister *reg_base = NULL;
+
+    /* The current call site we're constructing. */
+    MVMCallsite *cur_callsite = NULL;
+
+    /* Stash addresses of current op, register base and SC deref base
+     * in the TC; this will be used by anything that needs to switch
+     * the current place we're interpreting. */
+    tc->interp_cur_op         = &cur_op;
+    tc->interp_bytecode_start = &bytecode_start;
+    tc->interp_reg_base       = &reg_base;
+    tc->interp_cu             = &cu;
+    toplevel_initial_invoke(tc, cu->body.main_frame);
 }
 
 void p6_destroy() {
     MVM_vm_exit(instance);
 }
 
+void p6_call_method(char *name) {
+    MVMThreadContext *tc = instance->main_thread;
+    call_method_callback(0, name);
+}
+
 END_OF_C
 
-p6_initialize();
-p6_run_code('say "Hello World from Perl6!";');
-p6_run_code('say "Hello again!";');
-p6_destroy();
+1;
