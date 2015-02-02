@@ -19,7 +19,7 @@ extern SV *(*call_method_callback)(IV, char *);
 /*SV *(*call_method_callback)(IV, char *);*/
 
 MVMInstance *instance;
-const char *filename = "/home/nine/install/rakudo/inline.moarvm";
+const char *filename = "/home/nine/install/rakudo/install/languages/perl6/runtime/perl6.moarvm";
 
 /* This callback is passed to the interpreter code. It takes care of making
  * the initial invocation. */
@@ -66,7 +66,7 @@ void p6_initialize() {
 
     /* stash the rest of the raw command line args in the instance */
     instance->num_clargs = 0;
-    instance->prog_name  = "/home/nine/install/rakudo/inline.moarvm";
+    instance->prog_name  = "/home/nine/install/rakudo/install/languages/perl6/runtime/perl6.moarvm";
     instance->exec_name  = "perl6";
     instance->raw_clargs = NULL;
 
@@ -87,7 +87,7 @@ void p6_initialize() {
             MVM_interp_run(tc, &toplevel_initial_invoke, cu->body.deserialize_frame);
         }
     });
-    p6_run_code("use v6; use lib <lib>; use Inline::Perl6Helper;");
+    p6_run_code("/home/nine/Inline-Perl6/inline.pl6");
 
     /* Points to the current opcode. */
     MVMuint8 *cur_op = NULL;
