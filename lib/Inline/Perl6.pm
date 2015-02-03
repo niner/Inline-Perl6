@@ -5,8 +5,9 @@ use strict;
 use warnings;
 
 require Exporter;
+require DynaLoader;
 
-our @ISA = qw(Exporter);
+our @ISA = qw(Exporter DynaLoader);
 
 # Items to export into callers namespace by default. Note: do not export
 # names by default without a very good reason. Use EXPORT_OK instead.
@@ -27,8 +28,9 @@ our @EXPORT = qw(
 
 our $VERSION = '0.01';
 
-require XSLoader;
-XSLoader::load('Inline::Perl6', $VERSION);
+__PACKAGE__->bootstrap($VERSION);
+
+p6_setup_library_location($DynaLoader::dl_shared_objects[-1]);
 
 # Preloaded methods go here.
 

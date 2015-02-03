@@ -18,30 +18,24 @@ static void toplevel_initial_invoke(MVMThreadContext *tc, void *data) {
     MVM_frame_invoke(tc, (MVMStaticFrame *)data, MVM_callsite_get_common(tc, MVM_CALLSITE_ID_NULL_ARGS), NULL, NULL, NULL, -1);
 }
 
-void p6_run_code(char *code) {
-    const char *raw_clargs[1];
-    instance->num_clargs = 1;
-    raw_clargs[0] = code;
-    instance->raw_clargs = (char **)raw_clargs;
-    instance->clargs = NULL; /* clear cache */
-
-    MVMThreadContext *tc = instance->main_thread;
-    MVMStaticFrame *start_frame;
-
-    start_frame = cu->body.main_frame ? cu->body.main_frame : cu->body.frames[0];
-    MVM_interp_run(tc, &toplevel_initial_invoke, start_frame);
-}
-
 void init_call_method(SV *(*call_p6_method)(IV, char *)) {
     call_method_callback = call_p6_method;
 }
 
+char *library_location;
+
 MODULE = Inline::Perl6		PACKAGE = Inline::Perl6		
+
+void p6_setup_library_location(path)
+        char *path
+    CODE:
+        library_location = path;
 
 void
 p6_initialize()
     CODE:
         const char  *lib_path[8];
+        const char *raw_clargs[2];
 
         int argi         = 1;
         int lib_path_i   = 0;
@@ -58,7 +52,6 @@ p6_initialize()
             instance->lib_path[argi] = lib_path[argi];
 
         /* stash the rest of the raw command line args in the instance */
-        instance->num_clargs = 0;
         instance->prog_name  = PERL6_INSTALL_PATH "/languages/perl6/runtime/perl6.moarvm";
         instance->exec_name  = "perl6";
         instance->raw_clargs = NULL;
@@ -80,7 +73,16 @@ p6_initialize()
                 MVM_interp_run(tc, &toplevel_initial_invoke, cu->body.deserialize_frame);
             }
         });
-        p6_run_code("inline.pl6");
+        instance->num_clargs = 2;
+        raw_clargs[0] = "inline.pl6";
+        raw_clargs[1] = library_location;
+        instance->raw_clargs = (char **)raw_clargs;
+        instance->clargs = NULL; /* clear cache */
+
+        MVMStaticFrame *start_frame;
+
+        start_frame = cu->body.main_frame ? cu->body.main_frame : cu->body.frames[0];
+        MVM_interp_run(tc, &toplevel_initial_invoke, start_frame);
 
         /* Points to the current opcode. */
         MVMuint8 *cur_op = NULL;
