@@ -25,8 +25,6 @@ our $call_method = sub (Int $index, Str $name) returns OpaquePointer {
     return OpaquePointer;
 };
 
-sub init_call_method(&call_method (Int, Str --> OpaquePointer))
-    { ... }
-    native(&init_call_method);
+sub init_call_method(&call_method (Int, Str --> OpaquePointer)) is native('/home/nine/Inline-Perl6/blib/arch/auto/Inline/Perl6/Perl6.so') { * };
 
 init_call_method($call_method);

@@ -1,126 +1,88 @@
 package Inline::Perl6;
 
+use 5.020001;
 use strict;
 use warnings;
 
-use Inline C => config =>
-    libs => "-L$ENV{HOME}/install/rakudo/install/lib -lmoar",
-    inc => join(' ',
-        map { "-I$ENV{HOME}/install/rakudo/install/include/$_" }
-        qw(moar dynasm dyncall libatomic_ops libtommath libuv linenoise sha1 tinymt)
-    ),
-    optimize => '-g',
-;
+require Exporter;
 
-use Inline C => <<'END_OF_C';
-#include <moar.h>
+our @ISA = qw(Exporter);
 
-extern SV *(*call_method_callback)(IV, char *);
-/*SV *(*call_method_callback)(IV, char *);*/
+# Items to export into callers namespace by default. Note: do not export
+# names by default without a very good reason. Use EXPORT_OK instead.
+# Do not simply export all your public functions/methods/constants.
 
-MVMInstance *instance;
-const char *filename = "/home/nine/install/rakudo/install/languages/perl6/runtime/perl6.moarvm";
+# This allows declaration	use Inline::Perl6 ':all';
+# If you do not need this, moving things directly into @EXPORT or @EXPORT_OK
+# will save memory.
+our %EXPORT_TAGS = ( 'all' => [ qw(
+	
+) ] );
 
-/* This callback is passed to the interpreter code. It takes care of making
- * the initial invocation. */
-static void toplevel_initial_invoke(MVMThreadContext *tc, void *data) {
-    /* Create initial frame, which sets up all of the interpreter state also. */
-    MVM_frame_invoke(tc, (MVMStaticFrame *)data, MVM_callsite_get_common(tc, MVM_CALLSITE_ID_NULL_ARGS), NULL, NULL, NULL, -1);
-}
+our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 
-MVMCompUnit *cu;
+our @EXPORT = qw(
+	
+);
 
-void p6_run_code(char *code) {
-    const char *raw_clargs[1];
-    instance->num_clargs = 1;
-    raw_clargs[0] = code;
-    instance->raw_clargs = raw_clargs;
-    instance->clargs = NULL; /* clear cache */
+our $VERSION = '0.01';
 
-    MVMThreadContext *tc = instance->main_thread;
-    MVMStaticFrame *start_frame;
+require XSLoader;
+XSLoader::load('Inline::Perl6', $VERSION);
 
-    start_frame = cu->body.main_frame ? cu->body.main_frame : cu->body.frames[0];
-    MVM_interp_run(tc, &toplevel_initial_invoke, start_frame);
-}
+# Preloaded methods go here.
 
-void p6_initialize() {
-    const char  *executable_name = NULL;
-    const char  *lib_path[8];
+1;
+__END__
+# Below is stub documentation for your module. You'd better edit it!
 
-    int dump         = 0;
-    int full_cleanup = 0;
-    int argi         = 1;
-    int lib_path_i   = 0;
+=head1 NAME
 
-    MVM_crash_on_error();
+Inline::Perl6 - Perl extension for blah blah blah
 
-    instance   = MVM_vm_create_instance();
-    lib_path[lib_path_i++] = "/home/nine/install/rakudo/install/languages/nqp/lib";
-    lib_path[lib_path_i++] = "/home/nine/install/rakudo/install/languages/perl6/lib";
-    lib_path[lib_path_i++] = "/home/nine/install/rakudo/install/languages/perl6/runtime";
-    lib_path[lib_path_i++] = NULL;
+=head1 SYNOPSIS
 
-    for( argi = 0; argi < lib_path_i; argi++)
-        instance->lib_path[argi] = lib_path[argi];
+  use Inline::Perl6;
+  blah blah blah
 
-    /* stash the rest of the raw command line args in the instance */
-    instance->num_clargs = 0;
-    instance->prog_name  = "/home/nine/install/rakudo/install/languages/perl6/runtime/perl6.moarvm";
-    instance->exec_name  = "perl6";
-    instance->raw_clargs = NULL;
+=head1 DESCRIPTION
 
-    /* Map the compilation unit into memory and dissect it. */
-    MVMThreadContext *tc = instance->main_thread;
-    cu = MVM_cu_map_from_file(tc, filename);
+Stub documentation for Inline::Perl6, created by h2xs. It looks like the
+author of the extension was negligent enough to leave the stub
+unedited.
 
-    call_method_callback = NULL;
+Blah blah blah.
 
-    MVMROOT(tc, cu, {
-        /* The call to MVM_string_utf8_decode() may allocate, invalidating the
-           location cu->body.filename */
-        MVMString *const str = MVM_string_utf8_decode(tc, instance->VMString, filename, strlen(filename));
-        cu->body.filename = str;
+=head2 EXPORT
 
-        /* Run deserialization frame, if there is one. */
-        if (cu->body.deserialize_frame) {
-            MVM_interp_run(tc, &toplevel_initial_invoke, cu->body.deserialize_frame);
-        }
-    });
-    p6_run_code("/home/nine/Inline-Perl6/inline.pl6");
+None by default.
 
-    /* Points to the current opcode. */
-    MVMuint8 *cur_op = NULL;
 
-    /* The current frame's bytecode start. */
-    MVMuint8 *bytecode_start = NULL;
 
-    /* Points to the base of the current register set for the frame we
-     * are presently in. */
-    MVMRegister *reg_base = NULL;
+=head1 SEE ALSO
 
-    /* The current call site we're constructing. */
-    MVMCallsite *cur_callsite = NULL;
+Mention other useful documentation such as the documentation of
+related modules or operating system documentation (such as man pages
+in UNIX), or any relevant external documentation such as RFCs or
+standards.
 
-    /* Stash addresses of current op, register base and SC deref base
-     * in the TC; this will be used by anything that needs to switch
-     * the current place we're interpreting. */
-    tc->interp_cur_op         = &cur_op;
-    tc->interp_bytecode_start = &bytecode_start;
-    tc->interp_reg_base       = &reg_base;
-    tc->interp_cu             = &cu;
-    toplevel_initial_invoke(tc, cu->body.main_frame);
-}
+If you have a mailing list set up for your module, mention it here.
 
-void p6_destroy() {
-    MVM_vm_exit(instance);
-}
+If you have a web site set up for your module, mention it here.
 
-void p6_call_method(char *name) {
-    MVMThreadContext *tc = instance->main_thread;
-    call_method_callback(0, name);
-}
+=head1 AUTHOR
 
-END_OF_C
+Stefan Seifert, E<lt>nine@(none)E<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2015 by Stefan Seifert
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.20.1 or,
+at your option, any later version of Perl 5 you may have available.
+
+
+=cut
 
 1;
