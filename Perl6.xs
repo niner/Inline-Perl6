@@ -9,6 +9,7 @@
 #include "Perl6.h"
 
 SV *(*call_method_callback)(IV, char *);
+SV *(*eval_code_callback)(char *);
 MVMInstance *instance;
 MVMCompUnit *cu;
 const char *filename = PERL6_INSTALL_PATH "/languages/perl6/runtime/perl6.moarvm";
@@ -18,7 +19,8 @@ static void toplevel_initial_invoke(MVMThreadContext *tc, void *data) {
     MVM_frame_invoke(tc, (MVMStaticFrame *)data, MVM_callsite_get_common(tc, MVM_CALLSITE_ID_NULL_ARGS), NULL, NULL, NULL, -1);
 }
 
-void init_call_method(SV *(*call_p6_method)(IV, char *)) {
+void init_callbacks(SV *(*eval_p6_code)(char *), SV *(*call_p6_method)(IV, char *)) {
+    eval_code_callback = eval_p6_code;
     call_method_callback = call_p6_method;
 }
 
@@ -107,6 +109,12 @@ void
 p6_destroy()
     CODE:
         MVM_vm_exit(instance);
+
+void
+p6_eval_code(code)
+        char *code
+    CODE:
+        eval_code_callback(code);
 
 void
 p6_call_method(name)
