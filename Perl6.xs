@@ -6,11 +6,12 @@
 #include "ppport.h"
 
 #include <moar.h>
+#include "Perl6.h"
 
 SV *(*call_method_callback)(IV, char *);
 MVMInstance *instance;
 MVMCompUnit *cu;
-const char *filename = "/home/nine/install/rakudo/install/languages/perl6/runtime/perl6.moarvm";
+const char *filename = PERL6_INSTALL_PATH "/languages/perl6/runtime/perl6.moarvm";
 
 static void toplevel_initial_invoke(MVMThreadContext *tc, void *data) {
     /* Create initial frame, which sets up all of the interpreter state also. */
@@ -48,9 +49,9 @@ p6_initialize()
         MVM_crash_on_error();
 
         instance   = MVM_vm_create_instance();
-        lib_path[lib_path_i++] = "/home/nine/install/rakudo/install/languages/nqp/lib";
-        lib_path[lib_path_i++] = "/home/nine/install/rakudo/install/languages/perl6/lib";
-        lib_path[lib_path_i++] = "/home/nine/install/rakudo/install/languages/perl6/runtime";
+        lib_path[lib_path_i++] = PERL6_INSTALL_PATH "/languages/nqp/lib";
+        lib_path[lib_path_i++] = PERL6_INSTALL_PATH "/languages/perl6/lib";
+        lib_path[lib_path_i++] = PERL6_INSTALL_PATH "/languages/perl6/runtime";
         lib_path[lib_path_i++] = NULL;
 
         for( argi = 0; argi < lib_path_i; argi++)
@@ -58,7 +59,7 @@ p6_initialize()
 
         /* stash the rest of the raw command line args in the instance */
         instance->num_clargs = 0;
-        instance->prog_name  = "/home/nine/install/rakudo/install/languages/perl6/runtime/perl6.moarvm";
+        instance->prog_name  = PERL6_INSTALL_PATH "/languages/perl6/runtime/perl6.moarvm";
         instance->exec_name  = "perl6";
         instance->raw_clargs = NULL;
 
@@ -79,7 +80,7 @@ p6_initialize()
                 MVM_interp_run(tc, &toplevel_initial_invoke, cu->body.deserialize_frame);
             }
         });
-        p6_run_code("/home/nine/Inline-Perl6/inline.pl6");
+        p6_run_code("inline.pl6");
 
         /* Points to the current opcode. */
         MVMuint8 *cur_op = NULL;
