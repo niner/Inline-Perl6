@@ -14,6 +14,8 @@ MVMInstance *instance;
 MVMCompUnit *cu;
 const char *filename = PERL6_INSTALL_PATH "/languages/perl6/runtime/perl6.moarvm";
 
+PerlInterpreter *cur_my_perl;
+
 static void toplevel_initial_invoke(MVMThreadContext *tc, void *data) {
     /* Create initial frame, which sets up all of the interpreter state also. */
     MVM_frame_invoke(tc, (MVMStaticFrame *)data, MVM_callsite_get_common(tc, MVM_CALLSITE_ID_NULL_ARGS), NULL, NULL, NULL, -1);
@@ -22,6 +24,28 @@ static void toplevel_initial_invoke(MVMThreadContext *tc, void *data) {
 void init_callbacks(SV *(*eval_p6_code)(char *), SV *(*call_p6_method)(IV, char *)) {
     eval_code_callback = eval_p6_code;
     call_method_callback = call_p6_method;
+}
+
+SV *p5_int_to_sv(IV value) {
+    PerlInterpreter * const my_perl = cur_my_perl;
+    return newSViv(value);
+}
+
+SV *p5_float_to_sv(double value) {
+    PerlInterpreter * const my_perl = cur_my_perl;
+    return newSVnv((NV)value);
+}
+
+SV *p5_str_to_sv(char* value) {
+    PerlInterpreter * const my_perl = cur_my_perl;
+    SV * const sv = newSVpv(value, 0);
+    SvUTF8_on(sv);
+    return sv;
+}
+
+SV *p5_undef() {
+    const PerlInterpreter *my_perl = cur_my_perl;
+    return &PL_sv_undef;
 }
 
 char *library_location;
@@ -110,15 +134,20 @@ p6_destroy()
     CODE:
         MVM_vm_exit(instance);
 
-void
+SV *
 p6_eval_code(code)
         char *code
     CODE:
-        eval_code_callback(code);
+        cur_my_perl = my_perl;
+        RETVAL = eval_code_callback(code);
+    OUTPUT:
+        RETVAL
 
-void
+SV *
 p6_call_method(name)
         char *name
     CODE:
-        call_method_callback(0, name);
-
+        cur_my_perl = my_perl;
+        RETVAL = call_method_callback(0, name);
+    OUTPUT:
+        RETVAL
