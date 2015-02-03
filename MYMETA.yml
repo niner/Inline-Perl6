@@ -1,7 +1,7 @@
 ---
-abstract: 'Use Perl 6 in Perl 5'
+abstract: 'Perl extension for blah blah blah'
 author:
-  - 'Stefan Seifert <nine@detonation.org>'
+  - 'Stefan Seifert <nine@(none)>'
 build_requires:
   ExtUtils::MakeMaker: '0'
 configure_requires:

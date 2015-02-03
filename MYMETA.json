@@ -1,7 +1,7 @@
 {
-   "abstract" : "Use Perl 6 in Perl 5",
+   "abstract" : "Perl extension for blah blah blah",
    "author" : [
-      "Stefan Seifert <nine@detonation.org>"
+      "Stefan Seifert <nine@(none)>"
    ],
    "dynamic_config" : 0,
    "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.142690",

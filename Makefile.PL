@@ -18,10 +18,10 @@ WriteMakefile(
     #LICENSE           => 'perl',
     #Value must be from legacy list of licenses here
     #http://search.cpan.org/perldoc?Module%3A%3ABuild%3A%3AAPI
-    LIBS              => ["-Wl,--whole-archive -L$ENV{HOME}/install/rakudo/install/lib -lmoar -Wl,--no-whole-archive"], # e.g., '-lm'
+    LIBS              => ["-L$ENV{HOME}/install/rakudo/install/lib -lmoar"], # e.g., '-lm'
     DEFINE            => '', # e.g., '-DHAVE_SOMETHING'
     INC               => $inc, # e.g., '-I. -I/usr/include/other'
-    LDDLFLAGS         => "$Config{lddlflags} -rdynamic",
 	# Un-comment this if you add C files to link with later:
     # OBJECT            => '$(O_FILES)', # link all the C files too
 );
+

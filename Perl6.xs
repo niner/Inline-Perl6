@@ -21,7 +21,7 @@ void p6_run_code(char *code) {
     const char *raw_clargs[1];
     instance->num_clargs = 1;
     raw_clargs[0] = code;
-    instance->raw_clargs = raw_clargs;
+    instance->raw_clargs = (char **)raw_clargs;
     instance->clargs = NULL; /* clear cache */
 
     MVMThreadContext *tc = instance->main_thread;
@@ -40,11 +40,8 @@ MODULE = Inline::Perl6		PACKAGE = Inline::Perl6
 void
 p6_initialize()
     CODE:
-        const char  *executable_name = NULL;
         const char  *lib_path[8];
 
-        int dump         = 0;
-        int full_cleanup = 0;
         int argi         = 1;
         int lib_path_i   = 0;
 
@@ -94,9 +91,6 @@ p6_initialize()
          * are presently in. */
         MVMRegister *reg_base = NULL;
 
-        /* The current call site we're constructing. */
-        MVMCallsite *cur_callsite = NULL;
-
         /* Stash addresses of current op, register base and SC deref base
          * in the TC; this will be used by anything that needs to switch
          * the current place we're interpreting. */
@@ -115,6 +109,5 @@ void
 p6_call_method(name)
         char *name
     CODE:
-        MVMThreadContext *tc = instance->main_thread;
         call_method_callback(0, name);
 
