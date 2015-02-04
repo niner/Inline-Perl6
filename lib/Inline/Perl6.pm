@@ -30,7 +30,7 @@ our $VERSION = '0.01';
 
 __PACKAGE__->bootstrap($VERSION);
 
-p6_setup_library_location($DynaLoader::dl_shared_objects[-1]);
+setup_library_location($DynaLoader::dl_shared_objects[-1]);
 
 # Preloaded methods go here.
 

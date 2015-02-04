@@ -52,13 +52,13 @@ char *library_location;
 
 MODULE = Inline::Perl6		PACKAGE = Inline::Perl6		
 
-void p6_setup_library_location(path)
+void setup_library_location(path)
         char *path
     CODE:
         library_location = path;
 
 void
-p6_initialize()
+initialize()
     CODE:
         const char  *lib_path[8];
         const char *raw_clargs[2];
@@ -130,12 +130,12 @@ p6_initialize()
         toplevel_initial_invoke(tc, cu->body.main_frame);
 
 void
-p6_destroy()
+destroy()
     CODE:
         MVM_vm_exit(instance);
 
 SV *
-p6_eval_code(code)
+eval_code(code)
         char *code
     CODE:
         cur_my_perl = my_perl;
@@ -144,7 +144,7 @@ p6_eval_code(code)
         RETVAL
 
 SV *
-p6_call_method(name)
+call_method(name)
         char *name
     CODE:
         cur_my_perl = my_perl;
