@@ -132,7 +132,7 @@ initialize()
 void
 destroy()
     CODE:
-        MVM_vm_exit(instance);
+        MVM_vm_destroy_instance(instance);
 
 SV *
 eval_code(code)
