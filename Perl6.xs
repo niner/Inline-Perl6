@@ -135,7 +135,7 @@ destroy()
         MVM_vm_destroy_instance(instance);
 
 SV *
-eval_code(code)
+run(code)
         char *code
     CODE:
         cur_my_perl = my_perl;
@@ -144,7 +144,7 @@ eval_code(code)
         RETVAL
 
 SV *
-call_method(name)
+invoke(name)
         char *name
     CODE:
         cur_my_perl = my_perl;
