@@ -8,13 +8,19 @@ has Perl5Interpreter $!p5;
 
 sub p5_int_to_sv(Perl5Interpreter, Int --> OpaquePointer)
     is native(@*ARGS[0]) { * }
+sub p5_float_to_sv(Perl5Interpreter, num64 --> OpaquePointer)
+    is native(@*ARGS[0]) { * }
 sub p5_str_to_sv(Perl5Interpreter, Str --> OpaquePointer)
+    is native(@*ARGS[0]) { * }
+sub p5_buf_to_sv(Perl5Interpreter, Int, CArray[uint8] --> OpaquePointer)
     is native(@*ARGS[0]) { * }
 sub p5_undef(Perl5Interpreter, --> OpaquePointer)
     is native(@*ARGS[0]) { * }
 sub p5_sv_to_av(Perl5Interpreter, OpaquePointer --> OpaquePointer)
     is native(@*ARGS[0]) { * }
 sub p5_av_fetch(Perl5Interpreter, OpaquePointer, int32 --> OpaquePointer)
+    is native(@*ARGS[0]) { * }
+sub p5_av_push(Perl5Interpreter, OpaquePointer, OpaquePointer)
     is native(@*ARGS[0]) { * }
 sub p5_av_top_index(Perl5Interpreter, OpaquePointer --> int32)
     is native(@*ARGS[0]) { * }
@@ -26,21 +32,57 @@ sub p5_sv_to_char_star(Perl5Interpreter, OpaquePointer --> Str)
     is native(@*ARGS[0]) { * }
 sub p5_sv_utf8(Perl5Interpreter, OpaquePointer --> int32)
     is native(@*ARGS[0]) { * }
+sub p5_newHV(Perl5Interpreter --> OpaquePointer)
+    is native(@*ARGS[0]) { * }
+sub p5_newAV(Perl5Interpreter --> OpaquePointer)
+    is native(@*ARGS[0]) { * }
+sub p5_newRV_noinc(Perl5Interpreter, OpaquePointer --> OpaquePointer)
+    is native(@*ARGS[0]) { * }
+sub p5_hv_store(Perl5Interpreter, OpaquePointer, Str, OpaquePointer)
+    is native(@*ARGS[0]) { * }
 
 multi method p6_to_p5(Int:D $value) returns OpaquePointer {
     p5_int_to_sv($!p5, $value);
 }
-
 multi method p6_to_p5(Bool:D $value) returns OpaquePointer {
     p5_int_to_sv($!p5, $value ?? 1 !! 0);
 }
-
+multi method p6_to_p5(Num:D $value) returns OpaquePointer {
+    p5_float_to_sv($!p5, $value);
+}
+multi method p6_to_p5(Rat:D $value) returns OpaquePointer {
+    p5_float_to_sv($!p5, $value.Num);
+}
 multi method p6_to_p5(Str:D $value) returns OpaquePointer {
     p5_str_to_sv($!p5, $value);
 }
-
+multi method p6_to_p5(blob8:D $value) returns OpaquePointer {
+    my $array = CArray[uint8].new();
+    for ^$value.elems {
+        $array[$_] = $value[$_];
+    }
+    p5_buf_to_sv($!p5, $value.elems, $array);
+}
+multi method p6_to_p5(OpaquePointer $value) returns OpaquePointer {
+    $value;
+}
 multi method p6_to_p5(Any:U $value) returns OpaquePointer {
     p5_undef($!p5);
+}
+multi method p6_to_p5(Hash:D $value) returns OpaquePointer {
+    my $hv = p5_newHV($!p5);
+    for %$value -> $item {
+        my $value = self.p6_to_p5($item.value);
+        p5_hv_store($!p5, $hv, $item.key, $value);
+    }
+    p5_newRV_noinc($!p5, $hv);
+}
+multi method p6_to_p5(Positional:D $value) returns OpaquePointer {
+    my $av = p5_newAV($!p5);
+    for @$value -> $item {
+        p5_av_push($!p5, $av, self.p6_to_p5($item));
+    }
+    p5_newRV_noinc($!p5, $av);
 }
 
 method p5_to_p6(OpaquePointer $value) {
