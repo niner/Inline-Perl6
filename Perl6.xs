@@ -9,6 +9,7 @@
 #include "Perl6.h"
 
 SV *(*call_method_callback)(IV, char *);
+SV *(*call_function_callback)(char *);
 SV *(*eval_code_callback)(char *);
 MVMInstance *instance;
 MVMCompUnit *cu;
@@ -21,9 +22,10 @@ static void toplevel_initial_invoke(MVMThreadContext *tc, void *data) {
     MVM_frame_invoke(tc, (MVMStaticFrame *)data, MVM_callsite_get_common(tc, MVM_CALLSITE_ID_NULL_ARGS), NULL, NULL, NULL, -1);
 }
 
-void init_callbacks(SV *(*eval_p6_code)(char *), SV *(*call_p6_method)(IV, char *)) {
+void init_callbacks(SV *(*eval_p6_code)(char *), SV *(*call_p6_method)(IV, char *), SV *(*call_p6_function)(char *)) {
     eval_code_callback = eval_p6_code;
     call_method_callback = call_p6_method;
+    call_function_callback = call_p6_function;
 }
 
 SV *p5_int_to_sv(IV value) {
@@ -86,8 +88,6 @@ initialize()
         MVMThreadContext *tc = instance->main_thread;
         cu = MVM_cu_map_from_file(tc, filename);
 
-        call_method_callback = NULL;
-
         MVMROOT(tc, cu, {
             /* The call to MVM_string_utf8_decode() may allocate, invalidating the
                location cu->body.filename */
@@ -140,6 +140,15 @@ run(code)
     CODE:
         cur_my_perl = my_perl;
         RETVAL = eval_code_callback(code);
+    OUTPUT:
+        RETVAL
+
+SV *
+call(name)
+        char *name
+    CODE:
+        cur_my_perl = my_perl;
+        RETVAL = call_function_callback(name);
     OUTPUT:
         RETVAL
 

@@ -32,9 +32,14 @@ our $call_method = sub (Int $index, Str $name) returns OpaquePointer {
     return OpaquePointer;
 };
 
+our $call_function = sub (Str $name) returns OpaquePointer {
+    return p6_to_p5(&::($name)());
+};
+
 sub init_callbacks(
     &eval_code (Str --> OpaquePointer),
-    &call_method (Int, Str --> OpaquePointer)
+    &call_method (Int, Str --> OpaquePointer),
+    &call_function (Str --> OpaquePointer),
 ) is native(@*ARGS[0]) { * };
 
-init_callbacks($eval_code, $call_method);
+init_callbacks($eval_code, $call_method, $call_function);
