@@ -32,7 +32,19 @@ __PACKAGE__->bootstrap($VERSION);
 
 setup_library_location($DynaLoader::dl_shared_objects[-1]);
 
-# Preloaded methods go here.
+sub run {
+    my ($code) = @_;
+    return v6::run($code);
+}
+
+sub call {
+    return v6::call(@_);
+}
+
+sub destroy {
+    v6::uninit();
+    p6_destroy();
+}
 
 1;
 __END__

@@ -1,4 +1,3 @@
 use v6;
-use lib <lib>;
-use Inline::Perl6Helper;
-Inline::Perl6Helper.new;
+use Inline::Perl5;
+Inline::Perl5::init_inline_perl6_callback(@*ARGS[0]);
