@@ -53,45 +53,50 @@ sub destroy {
 
 1;
 __END__
-# Below is stub documentation for your module. You'd better edit it!
 
 =head1 NAME
 
-Inline::Perl6 - Perl extension for blah blah blah
+Inline::Perl6 - use the real Perl 6 from Perl 5 code
 
 =head1 SYNOPSIS
 
   use Inline::Perl6;
-  blah blah blah
+  Inline::Perl6::initialize;
+  Inline::Perl6::run("use Test; ok(1);");
+  Inline::Perl6::run("use Test; ok(2); done();");
+  Inline::Perl6::destroy;
 
 =head1 DESCRIPTION
 
-Stub documentation for Inline::Perl6, created by h2xs. It looks like the
-author of the extension was negligent enough to leave the stub
-unedited.
+This module embeds a MoarVM based Rakudo Perl 6 and allows you to run Perl 6
+code, load Perl 6 modules, use methods of Perl 6 objects and much more.
 
-Blah blah blah.
+=head1 INSTALLATION
+
+This module requires an up to date Rakudo with an enabled MoarVM backend.
+The perl6 executable needs to be in your PATH when you run Makefile.PL.
+You need to install the Inline::Perl5 Perl 6 module which this module is
+based on. You may do this using the "panda" Perl 6 module installer:
+
+  panda install Inline::Perl5
+  perl Makefile.PL
+  make
+  make test
+  make install
 
 =head2 EXPORT
 
 None by default.
 
-
-
 =head1 SEE ALSO
 
-Mention other useful documentation such as the documentation of
-related modules or operating system documentation (such as man pages
-in UNIX), or any relevant external documentation such as RFCs or
-standards.
+L<http://github.com/niner/Inline-Perl5> for more documentation.
 
-If you have a mailing list set up for your module, mention it here.
-
-If you have a web site set up for your module, mention it here.
+L<http://github.com/niner/Inline-Perl6> for the latest version.
 
 =head1 AUTHOR
 
-Stefan Seifert, E<lt>nine@(none)E<gt>
+Stefan Seifert, E<lt>nine@detonation.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
