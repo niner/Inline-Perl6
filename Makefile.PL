@@ -4,7 +4,7 @@ use ExtUtils::MakeMaker;
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence
 # the contents of the Makefile that is written.
 
-my $install_cmd = q{perl6 -e 'say $*EXECUTABLE.dirname.Str.subst(rx{\/<-[\/]>+$}, "")'};
+my $install_cmd = q{perl6-m -e 'say $*EXECUTABLE.dirname.Str.subst(rx{\/<-[\/]>+$}, "")'};
 my $install = qx{$install_cmd};
 chomp $install;
 say $install;
