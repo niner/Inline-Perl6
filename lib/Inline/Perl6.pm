@@ -4,6 +4,8 @@ use 5.020001;
 use strict;
 use warnings;
 
+use File::Spec;
+
 require Exporter;
 require DynaLoader;
 
@@ -28,9 +30,12 @@ our @EXPORT = qw(
 
 our $VERSION = '0.01';
 
+my ($helper_path) = grep { -e } map {File::Spec->catfile($_, qw(Inline Perl6 Helper.pm))} @INC
+    or die "Could not find Inline/Perl6/Helper.pm in \@INC (@INC)";
+
 __PACKAGE__->bootstrap($VERSION);
 
-setup_library_location($DynaLoader::dl_shared_objects[-1]);
+setup_library_location($DynaLoader::dl_shared_objects[-1], $helper_path);
 
 sub run {
     my ($code) = @_;

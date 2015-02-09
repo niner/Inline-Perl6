@@ -23,14 +23,16 @@ void init_inline_perl6_new_callback(SV *(*new_p5_callback)(PerlInterpreter *)) {
     p5_callback = new_p5_callback;
 }
 
-char *library_location;
+char *library_location, *helper_path;
 
 MODULE = Inline::Perl6		PACKAGE = Inline::Perl6		
 
-void setup_library_location(path)
+void setup_library_location(path, helper)
         char *path
+	char *helper
     CODE:
         library_location = path;
+	helper_path = helper;
 
 void
 initialize()
@@ -73,7 +75,7 @@ initialize()
             }
         });
         instance->num_clargs = 2;
-        raw_clargs[0] = "inline.pl6";
+        raw_clargs[0] = helper_path;
         raw_clargs[1] = library_location;
         instance->raw_clargs = (char **)raw_clargs;
         instance->clargs = NULL; /* clear cache */
