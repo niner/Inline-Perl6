@@ -7,7 +7,7 @@ use Test::More;
 use Inline::Perl6;
 
 Inline::Perl6::initialize;
-Inline::Perl6::run(q[
+Inline::Perl6::p6_run(q[
     class GLOBAL::Foo {
         method foo() {
             return 'foo';

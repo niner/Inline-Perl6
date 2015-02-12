@@ -9,21 +9,21 @@ use Inline::Perl6;
 
 Inline::Perl6::initialize;
 
-is Inline::Perl6::run('5'), 5;
-is Inline::Perl6::run('5.5'), 5.5;
-is Inline::Perl6::run('"Perl 5"'), 'Perl 5';
-is_deeply Inline::Perl6::run('[1, 2]'), [1, 2];
-is_deeply Inline::Perl6::run('[1, [2, 3]]'), [1, [2, 3]];
-is_deeply Inline::Perl6::run('{a => 1, b => 2}'), {a => 1, b => 2};
-is_deeply Inline::Perl6::run('{a => 1, b => {c => 3}}'), {a => 1, b => {c => 3}};
-is_deeply Inline::Perl6::run('[1, {b => {c => 3}}]'), [1, {b => {c => 3}}];
-ok not(defined Inline::Perl6::run('Any')), 'p5 undef maps to p6 Any';
+is Inline::Perl6::p6_run('5'), 5;
+is Inline::Perl6::p6_run('5.5'), 5.5;
+is Inline::Perl6::p6_run('"Perl 5"'), 'Perl 5';
+is_deeply Inline::Perl6::p6_run('[1, 2]'), [1, 2];
+is_deeply Inline::Perl6::p6_run('[1, [2, 3]]'), [1, [2, 3]];
+is_deeply Inline::Perl6::p6_run('{a => 1, b => 2}'), {a => 1, b => 2};
+is_deeply Inline::Perl6::p6_run('{a => 1, b => {c => 3}}'), {a => 1, b => {c => 3}};
+is_deeply Inline::Perl6::p6_run('[1, {b => {c => 3}}]'), [1, {b => {c => 3}}];
+ok not(defined Inline::Perl6::p6_run('Any')), 'p5 undef maps to p6 Any';
 
-is Inline::Perl6::run('
+is Inline::Perl6::p6_run('
     "Pörl 5"
 '), 'Pörl 5';
 
-is decode('latin-1', Inline::Perl6::run('
+is decode('latin-1', Inline::Perl6::p6_run('
     "Pörl 5".encode("latin-1")
 ')), 'Pörl 5';
 

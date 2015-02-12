@@ -37,8 +37,13 @@ __PACKAGE__->bootstrap($VERSION);
 
 setup_library_location($DynaLoader::dl_shared_objects[-1], $helper_path);
 
-sub run {
+sub p6_run {
     my ($code) = @_;
+    return v6::run($code);
+}
+
+sub run {
+    my ($self, $code) = @_;
     return v6::run($code);
 }
 
@@ -51,6 +56,27 @@ sub destroy {
     p6_destroy();
 }
 
+sub new {
+    initialize();
+    return bless {};
+}
+
+sub DESTROY {
+    destroy();
+}
+
+sub use {
+    my ($self, $module) = @_;
+
+    $self->run("use $module;");
+}
+
+sub invoke {
+    my ($self, $class, $method, @args) = @_;
+
+    return v6::invoke($class, $method, @args);
+}
+
 1;
 __END__
 
@@ -61,10 +87,14 @@ Inline::Perl6 - use the real Perl 6 from Perl 5 code
 =head1 SYNOPSIS
 
   use Inline::Perl6;
-  Inline::Perl6::initialize;
-  Inline::Perl6::run("use Test; ok(1);");
-  Inline::Perl6::run("use Test; ok(2); done();");
-  Inline::Perl6::destroy;
+
+  my $p6 = Inline::Perl6->new;
+  $p6->run("use Test; ok(1);");
+  $p6->run("use Test; ok(2); done();");
+
+  $p6->use('Foo');
+  my $foo = $p6->invoke('Foo', 'new');
+  my $baz = $foo->bar('baz');
 
 =head1 DESCRIPTION
 
