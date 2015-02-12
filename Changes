@@ -1,0 +1,6 @@
+0.03 2015-02-12 21:20 CET
+    - New OO API
+    - use() method for loading Perl6 modules
+    - invoke() method for invoking Perl6 class methods (like constructors)
+0.02 2015-02-09 19:00 CET
+    - First working version that allowed executing Perl 6 code from Perl 5.

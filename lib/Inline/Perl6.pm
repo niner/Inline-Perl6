@@ -28,7 +28,7 @@ our @EXPORT = qw(
 	
 );
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 my ($helper_path) = grep { -e } map {File::Spec->catfile($_, qw(Inline Perl6 Helper.pm))} @INC
     or die "Could not find Inline/Perl6/Helper.pm in \@INC (@INC)";
