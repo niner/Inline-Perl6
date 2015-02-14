@@ -8,6 +8,12 @@
 #include <moar.h>
 #include "Perl6.h"
 
+#ifdef PERL_IMPLICIT_CONTEXT
+    #define create_p6 p5_callback(my_perl)
+#else
+    #define create_p6 p5_callback(NULL)
+#endif
+
 SV *(*p5_callback)(PerlInterpreter *);
 MVMInstance *instance;
 MVMCompUnit *cu;
@@ -104,7 +110,7 @@ initialize()
         tc->interp_cu             = &cu;
         toplevel_initial_invoke(tc, cu->body.main_frame);
 
-        perl6 = p5_callback(my_perl);
+        perl6 = create_p6;
 
 void
 p6_destroy()
