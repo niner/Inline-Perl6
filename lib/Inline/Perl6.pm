@@ -1,6 +1,6 @@
 package Inline::Perl6;
 
-use 5.020001;
+use 5.018000;
 use strict;
 use warnings;
 

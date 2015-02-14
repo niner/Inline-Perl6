@@ -1,4 +1,4 @@
-use common::sense;
+use 5.18.0;
 
 use FindBin qw($Bin);
 use Inline::Perl6;
