@@ -1,3 +1,7 @@
+0.04 2015-03-23 21:15 CET
+    - Lower perl requirement to 5.18
+    - Support perl without multiplicity
+    - Be compatible with and require rakudo 2015.03
 0.03 2015-02-12 21:20 CET
     - New OO API
     - use() method for loading Perl6 modules
