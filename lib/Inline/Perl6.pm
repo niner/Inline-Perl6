@@ -114,6 +114,10 @@ based on. You may do this using the "panda" Perl 6 module installer:
   make test
   make install
 
+Please note that if you have multiple perl installations (e.g. with perlbrew),
+you have to use the exact same perl for installing Inline::Perl5 and
+Inline::Perl6.
+
 =head2 EXPORT
 
 None by default.
