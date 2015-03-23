@@ -18,7 +18,7 @@ SV *(*p5_callback)(PerlInterpreter *);
 MVMInstance *instance;
 MVMCompUnit *cu;
 SV *perl6;
-const char *filename = PERL6_INSTALL_PATH "/languages/perl6/runtime/perl6.moarvm";
+const char *filename = PERL6_INSTALL_PATH "/share/perl6/runtime/perl6.moarvm";
 
 static void toplevel_initial_invoke(MVMThreadContext *tc, void *data) {
     /* Create initial frame, which sets up all of the interpreter state also. */
@@ -52,16 +52,16 @@ initialize()
         MVM_crash_on_error();
 
         instance   = MVM_vm_create_instance();
-        lib_path[lib_path_i++] = PERL6_INSTALL_PATH "/languages/nqp/lib";
-        lib_path[lib_path_i++] = PERL6_INSTALL_PATH "/languages/perl6/lib";
-        lib_path[lib_path_i++] = PERL6_INSTALL_PATH "/languages/perl6/runtime";
+        lib_path[lib_path_i++] = PERL6_INSTALL_PATH "/share/nqp/lib";
+        lib_path[lib_path_i++] = PERL6_INSTALL_PATH "/share/perl6/lib";
+        lib_path[lib_path_i++] = PERL6_INSTALL_PATH "/share/perl6/runtime";
         lib_path[lib_path_i++] = NULL;
 
         for( argi = 0; argi < lib_path_i; argi++)
             instance->lib_path[argi] = lib_path[argi];
 
         /* stash the rest of the raw command line args in the instance */
-        instance->prog_name  = PERL6_INSTALL_PATH "/languages/perl6/runtime/perl6.moarvm";
+        instance->prog_name  = PERL6_INSTALL_PATH "/share/perl6/runtime/perl6.moarvm";
         instance->exec_name  = "perl6";
         instance->raw_clargs = NULL;
 
