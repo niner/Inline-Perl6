@@ -90,7 +90,7 @@ Inline::Perl6 - use the real Perl 6 from Perl 5 code
 
   my $p6 = Inline::Perl6->new;
   $p6->run("use Test; ok(1);");
-  $p6->run("use Test; ok(2); done();");
+  $p6->run("use Test; ok(2); done-testing();");
 
   $p6->use('Foo');
   my $foo = $p6->invoke('Foo', 'new');
