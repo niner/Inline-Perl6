@@ -115,5 +115,10 @@ initialize()
 void
 p6_destroy()
     CODE:
-    	SvREFCNT_dec(perl6);
-        MVM_vm_destroy_instance(instance);
+        if (perl6 != NULL) {
+            SvREFCNT_dec(perl6);
+            perl6 = NULL;
+	    /* Disabled due to crashes. Also moarvm itself doesn't do this by default.
+            MVM_vm_destroy_instance(instance);
+	    */
+        }
