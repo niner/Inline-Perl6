@@ -1,3 +1,6 @@
+0.05 2016-03-07 11:30 CET
+    - Update for compatibility with Perl 6.c and current MoarVM
+    - Documentation updates
 0.04 2015-03-23 21:15 CET
     - Lower perl requirement to 5.18
     - Support perl without multiplicity
