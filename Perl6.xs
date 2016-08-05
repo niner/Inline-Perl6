@@ -88,8 +88,7 @@ initialize()
 
         MVMStaticFrame *start_frame;
 
-        start_frame = cu->body.main_frame ? cu->body.main_frame : cu->body.frames[0];
-        MVM_interp_run(tc, &toplevel_initial_invoke, start_frame);
+        MVM_interp_run(tc, &toplevel_initial_invoke, cu->body.main_frame);
 
         /* Points to the current opcode. */
         MVMuint8 *cur_op = NULL;
