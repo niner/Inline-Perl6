@@ -1,3 +1,5 @@
+0.06 2016-08-05 17:00 CEST
+    - Update for compatibility with current MoarVM
 0.05 2016-03-07 11:30 CET
     - Update for compatibility with Perl 6.c and current MoarVM
     - Documentation updates
