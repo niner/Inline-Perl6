@@ -87,6 +87,16 @@ Inline::Perl6 - use the real Perl 6 from Perl 5 code
 =head1 SYNOPSIS
 
   use Inline::Perl6;
+  Inline::Perl6::initialize;
+
+  v6::run("say 'Hello from Perl 6'");
+  v6::call("say", "Hello again from Perl 6");
+  my $obj = v6::invoke("Some::Perl6::Class", "new", "First arg");
+  $obj->some_method(1, 2);
+
+  # or object oriented:
+
+  use Inline::Perl6
 
   my $p6 = Inline::Perl6->new;
   $p6->run("use Test; ok(1);");
