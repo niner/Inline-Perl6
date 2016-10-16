@@ -6,7 +6,6 @@ use utf8;
 use Test::More;
 use Inline::Perl6;
 
-Inline::Perl6::initialize;
 Inline::Perl6::p6_run(q[
     class GLOBAL::Foo {
         method foo() {
@@ -20,8 +19,6 @@ Inline::Perl6::p6_run(q[
 ]);
 
 is Inline::Perl6::call('new_foo')->foo, 'foo';
-
-Inline::Perl6::destroy;
 
 done_testing;
 

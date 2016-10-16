@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use utf8;
 
-use Inline::Perl6;
+use Inline::Perl6 'OO';
 
 STDOUT->autoflush(1);
 say '1..2';

@@ -28,7 +28,7 @@ our @EXPORT = qw(
 	
 );
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 my ($helper_path) = grep { -e } map {File::Spec->catfile($_, qw(Inline Perl6 Helper.pm))} @INC
     or die "Could not find Inline/Perl6/Helper.pm in \@INC (@INC)";
@@ -36,6 +36,16 @@ my ($helper_path) = grep { -e } map {File::Spec->catfile($_, qw(Inline Perl6 Hel
 __PACKAGE__->bootstrap($VERSION);
 
 setup_library_location($DynaLoader::dl_shared_objects[-1], $helper_path);
+
+my $destroy_in_end;
+my $initialized;
+sub import {
+    my ($class, $oo) = @_;
+    unless ($oo and $oo eq 'OO') {
+        $destroy_in_end = 1;
+        initialize() unless $initialized++;
+    }
+}
 
 sub p6_run {
     my ($code) = @_;
@@ -77,6 +87,10 @@ sub invoke {
     return v6::invoke($class, $method, @args);
 }
 
+sub END {
+    destroy() if $destroy_in_end;
+}
+
 1;
 __END__
 
@@ -87,7 +101,6 @@ Inline::Perl6 - use the real Perl 6 from Perl 5 code
 =head1 SYNOPSIS
 
   use Inline::Perl6;
-  Inline::Perl6::initialize;
 
   v6::run("say 'Hello from Perl 6'");
   v6::call("say", "Hello again from Perl 6");
@@ -96,7 +109,7 @@ Inline::Perl6 - use the real Perl 6 from Perl 5 code
 
   # or object oriented:
 
-  use Inline::Perl6
+  use Inline::Perl6 'OO';
 
   my $p6 = Inline::Perl6->new;
   $p6->run("use Test; ok(1);");
@@ -110,13 +123,15 @@ Inline::Perl6 - use the real Perl 6 from Perl 5 code
 
 This module embeds a MoarVM based Rakudo Perl 6 and allows you to run Perl 6
 code, load Perl 6 modules, use methods of Perl 6 objects and much more.
+Please look at https://github.com/niner/Inline-Perl5 for more information
+about usage.
 
 =head1 INSTALLATION
 
 This module requires an up to date Rakudo with an enabled MoarVM backend.
 The perl6 executable needs to be in your PATH when you run Makefile.PL.
 You need to install the Inline::Perl5 Perl 6 module which this module is
-based on. You may do this using the "panda" Perl 6 module installer:
+based on. You may do this using the "panda" or "zef" Perl 6 module installer:
 
   panda install Inline::Perl5
   perl Makefile.PL

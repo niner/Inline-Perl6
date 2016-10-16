@@ -1,5 +1,5 @@
 use Test::More;
-use Inline::Perl6;
+use Inline::Perl6 'OO';
 
 ok(1);
 Inline::Perl6::initialize;

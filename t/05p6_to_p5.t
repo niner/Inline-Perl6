@@ -7,8 +7,6 @@ use Encode qw(decode);
 use Test::More;
 use Inline::Perl6;
 
-Inline::Perl6::initialize;
-
 is Inline::Perl6::p6_run('5'), 5;
 is Inline::Perl6::p6_run('5.5'), 5.5;
 is Inline::Perl6::p6_run('"Perl 5"'), 'Perl 5';
@@ -26,7 +24,5 @@ is Inline::Perl6::p6_run('
 is decode('latin-1', Inline::Perl6::p6_run('
     "Pörl 5".encode("latin-1")
 ')), 'Pörl 5';
-
-Inline::Perl6::destroy;
 
 done_testing;
