@@ -9,6 +9,10 @@ my $install = qx{$install_cmd};
 chomp $install;
 say $install;
 
+my $moar_version_cmd = q{perl6-m -e 'say $*VM.version ge v2016.11.27.g.3171.dbba'};
+my $moar_version = qx{$moar_version_cmd};
+chomp $moar_version;
+
 my $inc = join(' ',
     map { "-I$install/include/$_" }
     qw(moar dynasm dyncall libatomic_ops libtommath libuv linenoise sha1 tinymt)
@@ -31,5 +35,8 @@ WriteMakefile(
 );
 
 open my $header, '>', 'Perl6.h';
-print { $header } qq{#define PERL6_INSTALL_PATH "$install"};
+print { $header } qq{#define PERL6_INSTALL_PATH "$install"\n};
+print { $header } $moar_version eq 'True'
+    ? qq{#define mark_thread_blocked(tc) MVM_gc_mark_thread_blocked(tc)\n}
+    : qq{#define mark_thread_blocked(tc)\n};
 close $header;

@@ -86,8 +86,6 @@ initialize()
         instance->raw_clargs = (char **)raw_clargs;
         instance->clargs = NULL; /* clear cache */
 
-        MVMStaticFrame *start_frame;
-
         MVM_interp_run(tc, &toplevel_initial_invoke, cu->body.main_frame);
 
         /* Points to the current opcode. */
@@ -108,6 +106,8 @@ initialize()
         tc->interp_reg_base       = &reg_base;
         tc->interp_cu             = &cu;
         toplevel_initial_invoke(tc, cu->body.main_frame);
+
+        mark_thread_blocked(tc);
 
         perl6 = create_p6;
 
