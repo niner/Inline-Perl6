@@ -55,6 +55,7 @@ initialize()
         lib_path[lib_path_i++] = PERL6_INSTALL_PATH "/share/nqp/lib";
         lib_path[lib_path_i++] = PERL6_INSTALL_PATH "/share/perl6/lib";
         lib_path[lib_path_i++] = PERL6_INSTALL_PATH "/share/perl6/runtime";
+        lib_path[lib_path_i++] = NQP_LIBDIR;
         lib_path[lib_path_i++] = NULL;
 
         for( argi = 0; argi < lib_path_i; argi++)
