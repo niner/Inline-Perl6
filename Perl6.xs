@@ -62,7 +62,7 @@ initialize()
 
         /* stash the rest of the raw command line args in the instance */
         instance->prog_name  = PERL6_INSTALL_PATH "/share/perl6/runtime/perl6.moarvm";
-        instance->exec_name  = "perl6";
+        instance->exec_name  = PERL6_EXECUTABLE;
         instance->raw_clargs = NULL;
 
         /* Map the compilation unit into memory and dissect it. */
